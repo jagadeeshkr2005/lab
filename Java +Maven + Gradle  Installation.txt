@@ -1,0 +1,58 @@
+#Java Installation
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y wget unzip curl git
+
+
+sudo apt update
+sudo apt install -y openjdk-17-jdk
+
+
+sudo tee /etc/profile.d/java.sh > /dev/null <<EOF
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH=\$JAVA_HOME/bin:\$PATH
+EOF
+
+sudo chmod +x /etc/profile.d/java.sh
+source /etc/profile.d/java.sh
+
+echo $JAVA_HOME
+java -version
+================================================
+#Maven Installation
+
+MAVEN_VERSION=3.9.6
+wget https://downloads.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
+
+sudo tar xf apache-maven-${MAVEN_VERSION}-bin.tar.gz -C /opt
+sudo ln -s /opt/apache-maven-${MAVEN_VERSION} /opt/maven
+
+sudo tee /etc/profile.d/maven.sh > /dev/null <<EOF
+export MAVEN_HOME=/opt/maven
+export PATH=\$MAVEN_HOME/bin:\$PATH
+EOF
+
+sudo chmod +x /etc/profile.d/maven.sh
+source /etc/profile.d/maven.sh
+
+mvn -version
+
+=================================================
+#GRADLE Installation
+
+GRADLE_VERSION=8.7
+wget https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip
+
+sudo unzip gradle-${GRADLE_VERSION}-bin.zip -d /opt
+sudo ln -s /opt/gradle-${GRADLE_VERSION} /opt/gradle
+
+sudo tee /etc/profile.d/gradle.sh > /dev/null <<EOF
+export GRADLE_HOME=/opt/gradle
+export PATH=\$GRADLE_HOME/bin:\$PATH
+EOF
+
+sudo chmod +x /etc/profile.d/gradle.sh
+source /etc/profile.d/gradle.sh
+
+gradle -version
+==============================================
+

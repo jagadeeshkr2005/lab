@@ -1,0 +1,31 @@
+sudo apt update
+sudo apt install -y ansible
+
+ vi ~/.ssh/key.pem
+
+
+ chmod 600 /home/ubuntu/.ssh/key.pem
+ chown ubuntu:ubuntu /home/ubuntu/.ssh/key.pem
+
+
+vi inventory.ini
+
+[webservers]
+ec2-user@54.165.160.193 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/key.pem ansible_user=ubuntu
+
+
+vi install_git.yml
+
+- name: Install Git on target server
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Ensure Git is installed
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+
+
+ansible-playbook -i inventory.ini install_git.yml
