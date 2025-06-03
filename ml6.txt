@@ -1,0 +1,60 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_openml
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Step 1: Load Boston Housing dataset
+data = fetch_openml(name='boston', version=1, as_frame=True)
+X = data.data[['RM']].values  # Using 'RM' (Average rooms per dwelling) as feature
+y = data.target.astype(float).values  # Convert target to float
+
+# Step 2: Split dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+
+# Step 3: Normalize data for better performance
+scaler = StandardScaler()
+X_train, X_test = scaler.fit_transform(X_train), scaler.transform(X_test) #calculates Mean and Std dev of X_train
+
+# Step 4: Define Locally Weighted Regression function
+def locally_weighted_regression(X, y, x_query, tau):
+    m = X.shape[0] #gets the number of training examples and X.shape[0] gives the number of rows
+    X_bias = np.c_[np.ones(m), X]  # Add bias term
+    x_query_bias = np.r_[1, x_query]  # Add bias term for query point
+    
+    # Compute weights using Gaussian Kernel (Eq. 4.4)
+    W = np.diag(np.exp(-np.square(X - x_query) / (2 * tau**2)).flatten())
+    
+    # Solve weighted least squares: θ = (X'WX)^(-1) X'Wy
+    theta = np.linalg.pinv(X_bias.T @ W @ X_bias) @ (X_bias.T @ W @ y)
+    return x_query_bias @ theta  # Prediction
+
+# Step 5: Compute LWR predictions
+tau = 0.4  # Bandwidth parameter
+y_pred = np.array([locally_weighted_regression(X_train, y_train, x_q, tau) for x_q in X_test])
+
+# Step 6: Plot results
+plt.figure(figsize=(14, 6))
+
+# Subplot 1: Scatter plot for LWR results
+plt.subplot(1, 2, 1)
+plt.scatter(X_train, y_train, label='Training Data', color='blue', alpha=0.5)
+plt.scatter(X_test, y_test, label='Test Data', color='green', alpha=0.5)
+plt.scatter(X_test, y_pred, color='red', label='LWR Predictions', alpha=0.7)
+plt.xlabel('Average Rooms per Dwelling (Normalized)')
+plt.ylabel('House Price')
+plt.title('Locally Weighted Regression on Boston Housing Data')
+plt.legend()
+
+# Subplot 2: Scatter plot for Predicted vs Actual Plot
+plt.subplot(1, 2, 2)
+plt.scatter(y_test, y_pred, color='blue', alpha=0.7)
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color='red', linestyle='--', label='Ideal Fit')
+plt.xlabel('Actual House Price')
+plt.ylabel('Predicted House Price')
+plt.title('Prediction vs Actual Plot for LWR')
+plt.legend()
+
+# Display both plots
+plt.tight_layout()
+plt.show()

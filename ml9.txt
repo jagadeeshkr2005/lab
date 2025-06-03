@@ -1,0 +1,31 @@
+from sklearn.datasets import fetch_olivetti_faces
+from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+
+# Step 1: Load the dataset
+faces = fetch_olivetti_faces()
+X = faces.data  # Each image is flattened (64x64 = 4096 features)
+y = faces.target  # Labels from 0 to 39
+
+# Step 2: Split into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42, stratify=y)
+
+# Step 3: Apply PCA for dimensionality reduction
+pca = PCA(n_components=100, whiten=True, random_state=42)
+X_train_pca = pca.fit_transform(X_train)
+X_test_pca = pca.transform(X_test)
+
+# Step 4: Train the Naive Bayes Classifier
+gnb = GaussianNB()
+gnb.fit(X_train_pca, y_train)
+
+# Step 5: Predict and Evaluate
+y_pred = gnb.predict(X_test_pca)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Accuracy of Naive Bayes on Olivetti Faces: {:.2f}%".format(accuracy * 100))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
