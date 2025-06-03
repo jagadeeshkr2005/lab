@@ -1,0 +1,5 @@
+['Sunny', 'Warm', 'Normal', 'Strong', 'Warm', 'Same', 'no']
+['Sunny', 'Warm', 'High', 'Strong', 'Warm', 'Same', 'yes']
+['Rainy', 'Cold', 'High', 'Strong', 'Warm', 'Change', 'no']
+['Sunny', 'Warm', 'High', 'Strong', 'Cool', 'change', 'yes']
+
